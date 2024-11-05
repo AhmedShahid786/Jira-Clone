@@ -1,7 +1,10 @@
 //? Hooks imports
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema } from "../schemas";
+import { useSignup } from "../api/use-signup";
+import { useForm } from "react-hook-form";
+import Link from "next/link";
 
 //? UI Components Imports
 import { FcGoogle } from "react-icons/fc";
@@ -24,18 +27,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import Link from "next/link";
-
-const formSchema = z.object({
-  name: z.string().trim().min(1, "Required"),
-  email: z.string().email(),
-  password: z.string().trim().min(8, "Password must contain minimum 8 characters").max(40, "Password can't be longer than 40 characters"),
-});
-
-
 export default function SignupCard() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate } = useSignup()
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name : "",
       email: "",
@@ -43,8 +38,8 @@ export default function SignupCard() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("form values => ", values);
+  const onSubmit = (values: z.infer<typeof signupSchema>) => {
+  mutate({json : values})
   };
 
   return (
